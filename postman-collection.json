@@ -1,0 +1,405 @@
+{
+  "info": {
+    "name": "Node.js Express API - CRUD Operations",
+    "description": "Complete REST API with Posts, Users, and Comments. Demonstrates Express.js, middleware, error handling, route parameters, query strings, and file-based storage using fs and path modules.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        },
+        "description": "Check server health and get timestamp"
+      },
+      "response": []
+    },
+    {
+      "name": "Analytics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/stats",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "stats"]
+        },
+        "description": "Get overall statistics (posts, users, comments, total likes)"
+      },
+      "response": []
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "GET All Posts (with filtering, sorting, pagination)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?author=John&search=Express&sort=newest&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"],
+              "query": [
+                { "key": "author", "value": "John", "description": "Filter by author name (optional)" },
+                { "key": "search", "value": "Express", "description": "Search in title and content (optional)" },
+                { "key": "sort", "value": "newest", "description": "Sort by: newest, oldest, popular (default: newest)" },
+                { "key": "page", "value": "1", "description": "Page number for pagination (default: 1)" },
+                { "key": "limit", "value": "10", "description": "Items per page (default: 10)" }
+              ]
+            },
+            "description": "Retrieve all posts with optional filtering, sorting, and pagination. Demonstrates query string usage."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Single Post by ID (Route Parameter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "1"],
+              "description": "Use numeric post ID as route parameter"
+            },
+            "description": "Retrieve a single post by its ID. Demonstrates route parameters (:id)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create New Post",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My New Post\",\n  \"content\": \"This is the content of my new post. It must be at least 10 characters long.\",\n  \"author\": \"Jane Doe\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"]
+            },
+            "description": "Create a new blog post. Validates title (min 3 chars), content (min 10 chars), author (min 2 chars). Returns 201 Created with the new post object."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Post",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"content\": \"Updated content with more than 10 characters\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "1"]
+            },
+            "description": "Update an existing post. Uses route parameter to identify the post. Returns updated post with timestamp."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/3",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "3"]
+            },
+            "description": "Delete a post by ID. Also deletes all associated comments. Returns 204 No Content on success."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Like Post",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/1/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts", "1", "like"]
+            },
+            "description": "Increment the like count for a post. Demonstrates custom action route."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Retrieve all users"
+          },
+          "response": []
+        },
+        {
+          "name": "GET User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Retrieve a single user by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Create a new user with name and email validation"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Update an existing user"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "2"]
+            },
+            "description": "Delete a user by ID. Returns 204 No Content."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "GET All Comments (with optional postId filter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/comments?postId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments"],
+              "query": [
+                { "key": "postId", "value": "1", "description": "Filter comments by post ID (optional)" }
+              ]
+            },
+            "description": "Retrieve all comments. Use postId query parameter to filter comments for a specific post."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Comment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "1"]
+            },
+            "description": "Retrieve a single comment by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"postId\": 1,\n  \"author\": \"Commenter\",\n  \"content\": \"This is a great post!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments"]
+            },
+            "description": "Create a new comment linked to a post (postId required)"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"author\": \"Updated Author\",\n  \"content\": \"Updated comment content\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "1"]
+            },
+            "description": "Update comment author and content"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/comments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "comments", "1"]
+            },
+            "description": "Delete a comment by ID"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Handling Examples",
+      "item": [
+        {
+          "name": "404 Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/nonexistent",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "nonexistent"]
+            },
+            "description": "Returns 404 with error JSON: {\"error\":{\"message\":\"Not Found\",\"status\":404}}"
+          },
+          "response": []
+        },
+        {
+          "name": "400 Bad Request - Validation Error",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ab\",\n  \"content\": \"short\",\n  \"author\": \"A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "posts"]
+            },
+            "description": "Validation middleware returns 400 with array of validation errors"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL of the API server"
+    }
+  ]
+}
